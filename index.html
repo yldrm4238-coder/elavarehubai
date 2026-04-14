@@ -781,11 +781,11 @@
                     <form action="#" class="lead-form" id="contactForm">
                         <div class="input-group">
                             <label>Your name*</label>
-                            <input type="text" id="inputName" name="name" placeholder="John Doe" required>
+                            <input type="text" id="inputName" name="name" placeholder="Your name" required>
                         </div>
                         <div class="input-group">
                             <label>E-mail*</label>
-                            <input type="email" id="inputEmail" name="email" placeholder="yildirimcelik1@gmail.com" required>
+                            <input type="email" id="inputEmail" name="email" placeholder="your@email.com" required>
                         </div>
                         <div class="input-group">
                             <label>Message</label>
@@ -889,7 +889,7 @@
             </div>
             <div class="footer-bottom-right">
                 <div class="footer-bottom-links">
-                    <a href="#">Privacy Policy</a>
+                    <a href="#" class="privacy-trigger">Privacy Policy</a>
                     <a href="#">Terms of Service</a>
                 </div>
                 <div class="footer-creator">
@@ -902,7 +902,7 @@
     <!-- COOKIE BANNER -->
     <div class="cookie-banner" id="cookieBanner">
         <div class="cookie-content">
-            <p class="cookie-text">We use cookies to improve your experience. By continuing, you agree to our <a href="#" id="openPrivacy">Privacy Policy</a>.</p>
+            <p class="cookie-text">We use cookies to improve your experience. By continuing, you agree to our <a href="#" class="privacy-trigger">Privacy Policy</a>.</p>
            <div class="cookie-actions">
                 <button class="cookie-btn cookie-decline" id="cookieDecline">Decline</button>
                 <button class="cookie-btn cookie-accept" id="cookieAccept">Accept</button>
@@ -1020,20 +1020,22 @@
             cookieBanner.classList.remove('visible');
         });
 
-        // Privacy Modal Logic
-        const openPrivacy = document.getElementById('openPrivacy');
+        // Universal Privacy Modal Logic
+        const privacyTriggers = document.querySelectorAll('.privacy-trigger');
         const closePrivacy = document.getElementById('closePrivacy');
         const privacyModal = document.getElementById('privacyModal');
 
-        openPrivacy.addEventListener('click', (e) => {
-            e.preventDefault();
-            privacyModal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        privacyTriggers.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                privacyModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
+            });
         });
 
         closePrivacy.addEventListener('click', () => {
             privacyModal.classList.remove('active');
-            document.body.style.overflow = 'auto'; // Restore scrolling
+            document.body.style.overflow = 'auto'; 
         });
 
         window.addEventListener('click', (e) => {

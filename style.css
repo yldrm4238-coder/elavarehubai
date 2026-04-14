@@ -2371,8 +2371,9 @@ FOOTER SECTION
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Vertically center */
+    justify-content: center; /* Horizontally center */
+    padding: 20px; /* Space from screen edges on small screens */
     z-index: 10001;
     opacity: 0;
     pointer-events: none;
