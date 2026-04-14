@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://elevare.ai/sitemap.xml
+Sitemap: https://www.elevarehub.ai/public/sitemap.xml
