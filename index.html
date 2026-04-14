@@ -204,7 +204,36 @@
             <div class="menu-line"></div>
             <div class="menu-line"></div>
         </div>
-    </header>
+    
+    <!-- PRIVACY POLICY MODAL -->
+    <div class="privacy-modal" id="privacyModal">
+        <div class="privacy-content">
+            <button class="privacy-close" id="closePrivacy">&times;</button>
+            <h2>Privacy Policy</h2>
+            <div class="privacy-body">
+                <p><strong>Last Updated:</strong> April 14, 2026</p>
+                
+                <h3>1. Introduction</h3>
+                <p>Welcome to Elevare Hub®. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us at info@elevarehub.ai.</p>
+
+                <h3>2. Information We Collect</h3>
+                <p>We collect personal information that you voluntarily provide to us when expressing an interest in obtaining information about us or our products and services, when participating in activities on the Website or otherwise contacting us.</p>
+
+                <h3>3. How We Use Your Information</h3>
+                <p>We use personal information collected via our Website for a variety of business purposes described below. We process your personal information for these purposes in reliance on our legitimate business interests, in order to enter into or perform a contract with you, with your consent, and/or for compliance with our legal obligations.</p>
+
+                <h3>4. Cookies and Similar Technologies</h3>
+                <p>We may use cookies and similar tracking technologies to access or store information. Specific information about how we use such technologies and how you can refuse certain cookies is set out in our Cookie Policy.</p>
+
+                <h3>5. Data Security</h3>
+                <p>We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. However, please also remember that we cannot guarantee that the internet itself is 100% secure.</p>
+
+                <h3>6. Contact Us</h3>
+                <p>If you have questions or comments about this policy, you may email us at info@elevarehub.ai.</p>
+            </div>
+        </div>
+    </div>
+</header>
 
     <div class="menu-overlay" id="menuOverlay">
         <div class="overlay-links">
@@ -224,8 +253,7 @@
     
     <main class="hero-section" id="hero">
         <video autoplay muted loop playsinline class="hero-bg-video hero-parallax-bg" poster="assets/hero-poster.jpg">
-            <source src="assets/yenivideo.MOV" type="video/quicktime">
-            <source src="assets/yenivideo.MOV" type="video/mp4">
+            <source src="assets/hero-bg-new.mp4" type="video/mp4">
         </video>
         
         <div class="hero-content">
@@ -870,8 +898,8 @@
     <!-- COOKIE BANNER -->
     <div class="cookie-banner" id="cookieBanner">
         <div class="cookie-content">
-            <p class="cookie-text">We use cookies to improve your experience. By continuing, you agree to our <a href="#">Privacy Policy</a>.</p>
-            <div class="cookie-actions">
+            <p class="cookie-text">We use cookies to improve your experience. By continuing, you agree to our <a href="#" id="openPrivacy">Privacy Policy</a>.</p>
+           <div class="cookie-actions">
                 <button class="cookie-btn cookie-decline" id="cookieDecline">Decline</button>
                 <button class="cookie-btn cookie-accept" id="cookieAccept">Accept</button>
             </div>
@@ -987,6 +1015,29 @@
             localStorage.setItem('cookieConsent', 'declined');
             cookieBanner.classList.remove('visible');
         });
-    </script>
+
+        // Privacy Modal Logic
+        const openPrivacy = document.getElementById('openPrivacy');
+        const closePrivacy = document.getElementById('closePrivacy');
+        const privacyModal = document.getElementById('privacyModal');
+
+        openPrivacy.addEventListener('click', (e) => {
+            e.preventDefault();
+            privacyModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+
+        closePrivacy.addEventListener('click', () => {
+            privacyModal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === privacyModal) {
+                privacyModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+   </script>
 </body>
 </html>
