@@ -107,6 +107,11 @@ body {
     letter-spacing: -0.04em;
     color: #000;
     text-decoration: none;
+    z-index: 1001; /* Logo ve menü her zaman üstte kalsın */
+}
+
+.navbar nav {
+    display: contents;
 }
 
 .logo-r {
