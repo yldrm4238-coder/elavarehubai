@@ -1,0 +1,165 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Project Golden Touch — Digital Alchemy design system.
+ * Apple-esque minimalism, light silver canvas, liquid gold accent.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --font-display: "Fraunces", "PP Neue Montreal", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "SF Pro Display", sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-pale: var(--gold-pale);
+  --color-carbon: var(--carbon);
+  --color-silver: var(--silver);
+}
+
+:root {
+  --radius: 1.25rem;
+
+  /* Brand canvas */
+  --background: oklch(0.965 0.003 95);       /* #F5F5F7 silver canvas */
+  --silver: oklch(0.93 0.004 95);
+  --foreground: oklch(0.21 0.006 270);       /* #1D1D1F dark carbon */
+  --carbon: oklch(0.21 0.006 270);
+
+  /* Liquid gold */
+  --gold: oklch(0.82 0.14 82);
+  --gold-deep: oklch(0.68 0.15 70);
+  --gold-pale: oklch(0.92 0.08 88);
+
+  --card: oklch(1 0 0 / 60%);
+  --card-foreground: var(--carbon);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--carbon);
+
+  --primary: var(--carbon);
+  --primary-foreground: oklch(0.98 0.003 95);
+  --secondary: oklch(0.94 0.004 95);
+  --secondary-foreground: var(--carbon);
+  --muted: oklch(0.94 0.004 95);
+  --muted-foreground: oklch(0.45 0.006 270);
+  --accent: var(--gold);
+  --accent-foreground: var(--carbon);
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.21 0.006 270 / 10%);
+  --input: oklch(0.21 0.006 270 / 12%);
+  --ring: var(--gold);
+
+  --gradient-gold: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold) 45%, var(--gold-deep) 100%);
+  --shadow-glass: 0 1px 0 rgba(255,255,255,0.6) inset, 0 30px 60px -30px rgba(29,29,31,0.18);
+  --shadow-float: 0 40px 80px -40px rgba(29,29,31,0.35);
+}
+
+.dark {
+  --background: oklch(0.18 0.005 270);
+  --foreground: oklch(0.96 0.003 95);
+  --card: oklch(0.22 0.005 270 / 60%);
+  --card-foreground: oklch(0.96 0.003 95);
+  --muted: oklch(0.26 0.005 270);
+  --muted-foreground: oklch(0.7 0.005 270);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility text-gold-gradient {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.4));
+}
+
+@utility glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-glass);
+}
+
+@utility glass-overlay {
+  background: linear-gradient(180deg, rgba(245,245,247,0) 0%, rgba(245,245,247,0.15) 50%, rgba(245,245,247,0.35) 100%);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@utility gold-shimmer {
+  background: linear-gradient(110deg, var(--gold-pale) 0%, var(--gold) 35%, var(--gold-deep) 50%, var(--gold) 65%, var(--gold-pale) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+@utility noise-texture {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+    z-index: 0;
+  }
+}
