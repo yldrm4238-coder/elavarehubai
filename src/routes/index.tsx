@@ -94,14 +94,14 @@ const projects: Project[] = [
     client: "Maison Atelier",
     stack: "Next.js · Shopify · Motion",
     poster: project1,
-    video: "/project1.mp4",
+    video: "/opt-project1.mp4",
   },
   {
     title: "AutoCouture",
     client: "AutoCouture",
     stack: "React · D3 · Supabase",
     poster: project2,
-    video: "/project2.mp4",
+    video: "/opt-project2.mp4",
     hoverColor: "#2A4B35",
   },
   {
@@ -109,7 +109,7 @@ const projects: Project[] = [
     client: "Ocean Whisper",
     stack: "Astro · GSAP · Sanity",
     poster: project3,
-    video: "/project3.mp4",
+    video: "/opt-project3.mp4",
     hoverColor: "#164062",
   },
   {
@@ -117,7 +117,7 @@ const projects: Project[] = [
     client: "Velvet Bite",
     stack: "React Native · Stripe · tRPC",
     poster: project4,
-    video: "/project4.mp4",
+    video: "/opt-project4.mp4",
     hoverColor: "#6CA5C9",
   },
 ];
