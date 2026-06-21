@@ -425,7 +425,7 @@ function Footer() {
               const projectType = formData.get("projectType") as string;
               const message = formData.get("message") as string;
 
-              const mailtoEmail = "info@elevarehub.com";
+              const mailtoEmail = "yildirimcelik1@gmail.com";
               const subject = encodeURIComponent(`ElevareHub AI - New Project Inquiry from ${name}`);
               const body = encodeURIComponent(
                 `Name: ${name}\n` +
