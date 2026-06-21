@@ -415,9 +415,28 @@ function Footer() {
             </p>
           </div>
 
-          {/* RIGHT — form */}
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const name = formData.get("name") as string;
+              const email = formData.get("email") as string;
+              const phone = formData.get("phone") as string;
+              const projectType = formData.get("projectType") as string;
+              const message = formData.get("message") as string;
+
+              const mailtoEmail = "info@elevarehub.com";
+              const subject = encodeURIComponent(`ElevareHub AI - New Project Inquiry from ${name}`);
+              const body = encodeURIComponent(
+                `Name: ${name}\n` +
+                `Email: ${email}\n` +
+                `Phone: ${phone}\n` +
+                `Project Type: ${projectType || "Not Specified"}\n\n` +
+                `Message:\n${message}`
+              );
+
+              window.location.href = `mailto:${mailtoEmail}?subject=${subject}&body=${body}`;
+            }}
             className="flex flex-col gap-4"
           >
             <div className="grid grid-cols-2 gap-4">
@@ -425,7 +444,9 @@ function Footer() {
                 <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Name</label>
                 <input
                   type="text"
+                  name="name"
                   placeholder="John Doe"
+                  required
                   className="rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80"
                 />
               </div>
@@ -433,7 +454,9 @@ function Footer() {
                 <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Email</label>
                 <input
                   type="email"
+                  name="email"
                   placeholder="you@company.com"
+                  required
                   className="rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80"
                 />
               </div>
@@ -443,6 +466,7 @@ function Footer() {
               <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Phone</label>
               <input
                 type="tel"
+                name="phone"
                 placeholder="+1 (555) 000-0000"
                 className="rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80"
               />
@@ -450,7 +474,10 @@ function Footer() {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Project Type</label>
-              <select className="rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80 appearance-none cursor-pointer">
+              <select 
+                name="projectType"
+                className="rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80 appearance-none cursor-pointer"
+              >
                 <option value="">Select a service…</option>
                 <option>Landing Page</option>
                 <option>Corporate Website</option>
@@ -464,8 +491,10 @@ function Footer() {
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Message</label>
               <textarea
+                name="message"
                 rows={4}
                 placeholder="Tell us about your project…"
+                required
                 className="resize-none rounded-xl border border-border bg-white/60 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none backdrop-blur-sm transition-colors focus:border-foreground/30 focus:bg-white/80"
               />
             </div>
