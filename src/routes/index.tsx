@@ -310,7 +310,7 @@ function Portfolio() {
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <figure className="group relative mx-auto w-full max-w-3xl">
+    <figure className="group relative mx-auto w-[60%] sm:w-[50%] max-w-3xl">
       <div className="absolute inset-x-0 top-[-30px] flex items-center justify-between px-4 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
         <span>0{index + 1}</span>
         <span className="hidden sm:inline">{project.client}</span>
