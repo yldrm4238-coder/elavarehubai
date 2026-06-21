@@ -326,7 +326,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {project.video ? (
           <video
             src={project.video}
-            poster={project.poster}
             autoPlay
             muted
             loop
