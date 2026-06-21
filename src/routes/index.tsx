@@ -319,7 +319,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       <div
         className="relative overflow-hidden rounded-[24px] border-2 border-white/40 bg-white/30 shadow-[var(--shadow-glass)] backdrop-blur-xl transition-all duration-500 ease-out group-hover:border-[var(--hover-color)] group-hover:shadow-[0_0_32px_color-mix(in_oklab,var(--hover-color)_35%,transparent)]"
         style={{ 
-          aspectRatio: "16 / 18",
+          aspectRatio: "9 / 16",
           "--hover-color": project.hoverColor || "var(--gold)"
         } as React.CSSProperties}
       >
