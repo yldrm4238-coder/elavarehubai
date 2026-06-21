@@ -207,7 +207,6 @@ function Hero() {
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <video
           src="/video.mp4"
-          poster={heroPoster}
           autoPlay
           muted
           loop
