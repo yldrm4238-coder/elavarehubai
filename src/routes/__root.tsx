@@ -76,6 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      { name: "facebook-domain-verification", content: "dnjugk5zuhlvm5c2lzx62ks8auey3n" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "ElevareHub AI — Digital Alchemy Studio" },
       { name: "description", content: "ElevareHub AI transforms ideas into digital gold. Minimalist, high-performance web experiences." },
