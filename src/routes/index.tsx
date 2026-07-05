@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Search, Zap, Shield, Layers, Menu, X } from "lucide-react";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroPoster from "@/assets/hero-poster.jpg";
 import project1 from "@/assets/project-1.jpg";
 import project2 from "@/assets/project-2.jpg";
 import project3 from "@/assets/project-3.jpg";
 import project4 from "@/assets/project-4.jpg";
-
-import projectVideoA from "@/assets/project-a.mp4.asset.json";
-import projectVideoB from "@/assets/project-b.mp4.asset.json";
 
 function FadeIn({
   children,
@@ -200,85 +199,255 @@ function Nav() {
   );
 }
 
+const DESKTOP_FRAME_COUNT = 342;
+const MOBILE_FRAME_COUNT = 240;
+
+function buildFrameUrls(base: "desktop" | "mobile", count: number) {
+  return Array.from(
+    { length: count },
+    (_, i) => `/${base}/${String(i + 1).padStart(5, "0")}.webp`
+  );
+}
+
+// Kare ilerlemesinin normal hızı (1800vh boyunca 342/240 kare eşit dağılır).
+const BASE_SCROLL_VH = 1800;
+// Kadının son karesi (desktop'ta 243. kare) burada 100vh boyunca donar.
+const MID_HOLD_VH = 100;
+// Son kare, sona erdiğinde 100vh boyunca donar.
+const END_HOLD_VH = 100;
+const TOTAL_SCROLL_VH = BASE_SCROLL_VH + MID_HOLD_VH + END_HOLD_VH;
+const HOLD_FRAME_FRACTION = 243 / DESKTOP_FRAME_COUNT;
+
+function frameIndexForProgress(progress: number, frameCount: number) {
+  const holdFrameIndex = Math.min(
+    frameCount - 1,
+    Math.round(HOLD_FRAME_FRACTION * (frameCount - 1))
+  );
+  const holdFrameVh = (holdFrameIndex / (frameCount - 1)) * BASE_SCROLL_VH;
+  const currentVh = progress * TOTAL_SCROLL_VH;
+
+  let effectiveVh: number;
+  if (currentVh <= holdFrameVh) {
+    effectiveVh = currentVh;
+  } else if (currentVh <= holdFrameVh + MID_HOLD_VH) {
+    effectiveVh = holdFrameVh;
+  } else if (currentVh <= holdFrameVh + MID_HOLD_VH + (BASE_SCROLL_VH - holdFrameVh)) {
+    effectiveVh = currentVh - MID_HOLD_VH;
+  } else {
+    effectiveVh = BASE_SCROLL_VH;
+  }
+
+  return Math.min(
+    frameCount - 1,
+    Math.round((effectiveVh / BASE_SCROLL_VH) * (frameCount - 1))
+  );
+}
+
 function Hero() {
+  const isMobile = useIsMobile();
+  const base: "desktop" | "mobile" = isMobile ? "mobile" : "desktop";
+  const frameCount = isMobile ? MOBILE_FRAME_COUNT : DESKTOP_FRAME_COUNT;
+  const frameUrls = useMemo(() => buildFrameUrls(base, frameCount), [base, frameCount]);
+
+  const containerRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  const wrapperScale = useTransform(scrollYProgress, [0.95, 1], [1, 0.92]);
+  const wrapperBorderRadius = useTransform(scrollYProgress, [0.95, 1], ["0px", "24px"]);
+
+  // Metin scroll'un sonuna kadar gizli kalsın, son %20'de yukarı kayarak belirsin.
+  const textOpacity = useTransform(scrollYProgress, [0, 0.8, 0.92, 1], [0, 0, 1, 1]);
+  const textY = useTransform(scrollYProgress, [0, 0.8, 0.92, 1], [28, 28, 0, 0]);
+  const textVisibility = useTransform(textOpacity, (v) => (v > 0.01 ? "visible" : "hidden"));
+
+  const drawFrame = (index: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+
+    const img = imagesRef.current[index];
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = window.innerWidth;
+    const cssHeight = window.innerHeight;
+
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    canvas.style.width = `${cssWidth}px`;
+    canvas.style.height = `${cssHeight}px`;
+
+    const canvasRatio = cssWidth / cssHeight;
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+
+    let renderWidth = cssWidth;
+    let renderHeight = cssHeight;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasRatio > imgRatio) {
+      renderHeight = cssWidth / imgRatio;
+      offsetY = (cssHeight - renderHeight) / 2;
+    } else {
+      renderWidth = cssHeight * imgRatio;
+      offsetX = (cssWidth - renderWidth) / 2;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.drawImage(img, offsetX, offsetY, renderWidth, renderHeight);
+    ctx.restore();
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoaded(false);
+    setLoadingProgress(0);
+    imagesRef.current = [];
+
+    let loadedCount = 0;
+    const total = frameUrls.length;
+
+    frameUrls.forEach((url, i) => {
+      const img = new Image();
+      const onSettled = () => {
+        if (cancelled) return;
+        loadedCount++;
+        setLoadingProgress(Math.round((loadedCount / total) * 100));
+        if (loadedCount === total) {
+          setTimeout(() => {
+            if (!cancelled) setLoaded(true);
+          }, 300);
+          drawFrame(0);
+        }
+      };
+      img.onload = onSettled;
+      img.onerror = onSettled;
+      img.src = url;
+      imagesRef.current[i] = img;
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frameUrls]);
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (!loaded) return;
+    const frameIndex = frameIndexForProgress(latest, frameUrls.length);
+    requestAnimationFrame(() => drawFrame(frameIndex));
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (loaded) {
+        const frameIndex = frameIndexForProgress(scrollYProgress.get(), frameUrls.length);
+        drawFrame(frameIndex);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [loaded, scrollYProgress, frameUrls]);
+
   return (
-    <section id="top" className="relative flex min-h-[100svh] items-center justify-center px-6 pt-28 pb-16 sm:pt-32">
-      {/* Video background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <video
-          src="/video.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* Hafif karartma — metin okunabilirliği için */}
-        <div
-          className="absolute inset-0"
+    <>
+      <AnimatePresence>
+        {!loaded && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[var(--carbon)] text-white"
+          >
+            <div className="flex flex-col items-center gap-6">
+              <div className="relative h-[120px] w-[1px] overflow-hidden bg-white/20">
+                <motion.div
+                  className="absolute bottom-0 w-full bg-[var(--gold)]"
+                  initial={{ height: "0%" }}
+                  animate={{ height: `${loadingProgress}%` }}
+                  transition={{ duration: 0.2 }}
+                />
+              </div>
+              <p className="font-display text-sm tracking-[0.3em] uppercase">
+                {loadingProgress}%
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="fixed top-0 left-0 z-0 flex h-[100svh] min-h-[640px] w-full items-center justify-center overflow-hidden origin-center will-change-transform"
+        style={{
+          scale: wrapperScale,
+          borderRadius: wrapperBorderRadius,
+        }}
+      >
+        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover" />
+
+        {/* Metin belirirken devreye giren hafif merkez vinyeti — okunabilirlik için */}
+        <motion.div
+          className="pointer-events-none absolute inset-0"
           style={{
+            opacity: textOpacity,
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.55) 100%)",
+              "radial-gradient(circle at 50% 55%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 35%, transparent 62%)",
           }}
         />
-        {/* Film grain / kumlama filtresi */}
-        <svg
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
+
+        <motion.div
+          style={{ opacity: textOpacity, y: textY, visibility: textVisibility as any }}
+          className="relative mx-auto max-w-2xl px-6 text-center"
         >
-          <filter id="grain">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.72"
-              numOctaves="4"
-              stitchTiles="stitch"
+          <h1 className="font-display text-5xl font-medium leading-[1.06] tracking-tight text-white sm:text-6xl md:text-7xl">
+            We design the web.
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-sm text-sm leading-relaxed text-white/55 sm:text-base">
+            Premium web design for brands that refuse to blend in.
+          </p>
+
+          <div className="mt-10 flex items-center justify-center gap-4">
+            <a
+              href="#contact"
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-[var(--carbon)] transition-transform hover:-translate-y-0.5"
             >
-              <animate
-                attributeName="baseFrequency"
-                values="0.70;0.74;0.70"
-                dur="0.4s"
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#grain)" opacity="0.40" />
-        </svg>
-      </div>
+              Book a Free Call
+              <span className="transition-transform group-hover:translate-x-0.5">→</span>
+            </a>
+          </div>
+        </motion.div>
 
-      <div className="relative mx-auto max-w-2xl text-center">
-        <h1 className="font-display text-5xl font-medium leading-[1.06] tracking-tight text-white sm:text-6xl md:text-7xl">
-          We design the web.
-        </h1>
-
-        <p className="mx-auto mt-5 max-w-sm text-sm leading-relaxed text-white/55 sm:text-base">
-          Premium web design for brands that refuse to blend in.
-        </p>
-
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-[var(--carbon)] transition-transform hover:-translate-y-0.5"
-          >
-            Book a Free Call
-            <span className="transition-transform group-hover:translate-x-0.5">→</span>
-          </a>
+        {/* Scroll cue */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.3em] text-white/60">
+          Scroll
         </div>
-      </div>
+      </motion.div>
 
-      {/* Scroll cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.3em] text-white/60">
-        Scroll
-      </div>
-    </section>
+      {/* Görünmez kaydırma alanı (scroll spacer) */}
+      <section
+        ref={containerRef}
+        id="top"
+        className="relative w-full pointer-events-none"
+        style={{ height: `${TOTAL_SCROLL_VH}vh` }}
+      />
+    </>
   );
 }
 
 function Portfolio() {
   return (
-    <section id="work" className="noise-texture relative overflow-hidden px-6 pt-32 pb-16 sm:pt-48 sm:pb-24">
+    <section id="work" className="noise-texture relative z-10 overflow-hidden bg-background px-6 pt-32 pb-16 sm:pt-48 sm:pb-24">
       <div className="mx-auto max-w-7xl">
         <FadeIn>
           <div className="mb-20 max-w-2xl sm:mb-28">
@@ -296,9 +465,7 @@ function Portfolio() {
           <ul className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 sm:gap-8">
             {projects.map((p, i) => (
               <li key={p.title} className="relative">
-                <FadeIn delay={i * 200}>
-                  <ProjectCard project={p} index={i} />
-                </FadeIn>
+                <ProjectCard project={p} index={i} />
               </li>
             ))}
           </ul>
@@ -310,18 +477,28 @@ function Portfolio() {
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <figure className="group relative mx-auto w-full max-w-3xl">
+    <motion.figure
+      className="group relative mx-auto w-full max-w-3xl"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.15 }}
+    >
       <div className="absolute inset-x-0 top-[-30px] flex items-center justify-between px-4 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
         <span>0{index + 1}</span>
         <span className="hidden sm:inline">{project.client}</span>
       </div>
 
-      <div
-        className="relative overflow-hidden rounded-[24px] border-2 border-white/40 bg-white/30 shadow-[var(--shadow-glass)] backdrop-blur-xl transition-all duration-500 ease-out group-hover:border-[var(--hover-color)] group-hover:shadow-[0_0_32px_color-mix(in_oklab,var(--hover-color)_35%,transparent)]"
-        style={{ 
+      <motion.div
+        className="relative overflow-hidden rounded-[24px] border-2 border-white/40 bg-white/30 shadow-[var(--shadow-glass)] backdrop-blur-xl transition-[border-color,box-shadow] duration-500 ease-out group-hover:border-[var(--hover-color)] group-hover:shadow-[0_0_32px_color-mix(in_oklab,var(--hover-color)_35%,transparent)]"
+        style={{
           aspectRatio: "9 / 16",
           "--hover-color": project.hoverColor || "var(--gold)"
         } as React.CSSProperties}
+        initial={{ clipPath: "inset(100% 0% 0% 0%)", scale: 1.08 }}
+        whileInView={{ clipPath: "inset(0% 0% 0% 0%)", scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.9, ease: [0.65, 0, 0.35, 1], delay: index * 0.15 + 0.1 }}
       >
         {project.video ? (
           <video
@@ -365,7 +542,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Mobile meta (always visible) */}
       <figcaption className="mt-5 flex items-baseline justify-between gap-4 sm:hidden">
@@ -379,13 +556,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           0{index + 1}
         </span>
       </figcaption>
-    </figure>
+    </motion.figure>
   );
 }
 
 function Footer() {
   return (
-    <footer id="contact" className="relative overflow-hidden border-t border-border/40 px-6 pb-10 pt-24">
+    <footer id="contact" className="relative overflow-hidden border-t border-border/40 bg-background px-6 pb-10 pt-24">
 
       {/* Gold glow */}
       <div
@@ -542,7 +719,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section id="how" className="relative px-4 pt-16 pb-24 sm:px-8 sm:pt-20 sm:pb-32">
+    <section id="how" className="relative bg-background px-4 pt-16 pb-24 sm:px-8 sm:pt-20 sm:pb-32">
       {/* Section Divider */}
       <div className="absolute inset-x-0 top-0 mx-auto max-w-5xl h-px bg-border/60" />
       
@@ -603,7 +780,7 @@ function WhyUs() {
   ];
 
   return (
-    <section id="why" className="relative px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-32">
+    <section id="why" className="relative bg-background px-4 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-32">
       <div className="mx-auto max-w-7xl">
         <FadeIn>
           <div className="mb-16 flex flex-col items-center text-center">
