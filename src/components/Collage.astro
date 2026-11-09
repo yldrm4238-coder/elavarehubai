@@ -1,0 +1,15 @@
+---
+import { Image } from "astro:assets";
+import { work } from "../lib/img";
+import type { Shot } from "../data/site";
+interface Props { shots: Shot[]; eager?: boolean; ratio?: string }
+const { shots, eager = false, ratio = "4 / 3" } = Astro.props;
+---
+<div class="collage" style={`--ratio:${ratio}`}>
+  {shots.map((s, i) => (
+    <figure class="shot" style={s.style}>
+      <Image src={work(s.file)} alt={s.alt} widths={[480, 720, 1100, 1500]} sizes="(min-width: 900px) 36vw, 90vw" format="webp" quality={78}
+        loading={eager ? "eager" : "lazy"} decoding="async" />
+    </figure>
+  ))}
+</div>

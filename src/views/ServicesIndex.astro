@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import { content } from "../data/content";
+import { breadcrumbs } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const { services } = content(lang);
+---
+<Base title={t.services.title} description={t.services.description} path={L("/services/")}
+  schema={[breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.services, L("/services/")]])]}>
+  <div class="wrap page-head">
+    <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / {t.crumbs.services}</p>
+    <h1 class="h1">{t.services.h1}</h1>
+    <p class="lede" style="margin-top:1.5rem">{t.services.lede}</p>
+  </div>
+  <section class="wrap" style="padding-top:0">
+    <ul class="svc-list">
+      {services.map((s, i) => (
+        <li><a class="svc-row" href={L(`/services/${s.slug}/`)}><span class="n">0{i + 1}</span><span class="t">{s.name}</span><p class="d">{s.short}</p><span class="arr" aria-hidden="true">→</span></a></li>
+      ))}
+    </ul>
+  </section>
+  <Cta lang={lang} />
+</Base>

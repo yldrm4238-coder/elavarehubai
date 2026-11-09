@@ -1,0 +1,40 @@
+---
+import Base from "../layouts/Base.astro";
+import Faq from "../components/Faq.astro";
+import Cta from "../components/Cta.astro";
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { breadcrumbs, faqPage, serviceSchema } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const { services } = content(lang);
+const svc = services.find((x) => x.slug === slug)!;
+const rel = services.filter((x) => svc.related.includes(x.slug));
+---
+<Base title={svc.title} description={svc.description} path={L(`/services/${svc.slug}/`)}
+  schema={[serviceSchema(svc, lang), faqPage(svc.faqs), breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.services, L("/services/")], [svc.name, L(`/services/${svc.slug}/`)]])]}>
+  <div class="wrap page-head">
+    <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / <a href={L("/services/")}>{t.crumbs.services}</a> / {svc.name}</p>
+    <h1 class="h1">{svc.name}</h1>
+    <p class="def">{svc.definition}</p>
+    <p class="hero-cta"><a class="btn" href={`mailto:${SITE.email}?subject=${encodeURIComponent(svc.name)}`}>{t.services.talk}</a></p>
+  </div>
+  <section class="wrap two" aria-labelledby="for-h" style="padding-top:2rem">
+    <h2 id="for-h" class="h2" style="font-size:clamp(1.6rem,3vw,2.4rem)">{t.services.whoFor}</h2>
+    <p class="lede" style="margin:0">{svc.forWho}</p>
+  </section>
+  <section class="wrap two" aria-labelledby="get-h">
+    <h2 id="get-h" class="h2" style="font-size:clamp(1.6rem,3vw,2.4rem)">{t.services.whatYouGet}</h2>
+    <ul class="deliver">
+      {svc.deliverables.map((d, i) => <li><span class="n">0{i + 1}</span><div><h3>{d.h}</h3><p>{d.p}</p></div></li>)}
+    </ul>
+  </section>
+  <section class="wrap"><Faq items={svc.faqs} heading={t.faq.svc(svc.name)} lang={lang} /></section>
+  <section class="wrap" aria-labelledby="rel-h" style="padding-top:0">
+    <h2 id="rel-h" class="h2" style="font-size:clamp(1.6rem,3vw,2.4rem)">{t.services.related}</h2>
+    <div class="related">{rel.map((r) => <a href={L(`/services/${r.slug}/`)}><strong>{r.name}</strong>{r.short}</a>)}</div>
+  </section>
+  <Cta lang={lang} />
+</Base>

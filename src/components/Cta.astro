@@ -1,0 +1,14 @@
+---
+import { SITE } from "../data/site";
+import { ui, type Lang } from "../i18n";
+const { lang = "en", text } = Astro.props as { lang?: Lang; text?: string };
+const t = ui[lang];
+---
+<section class="cta reveal" aria-labelledby="cta-h">
+  <h2 id="cta-h" class="mega">{t.cta.h}</h2>
+  <p class="lede">{text ?? t.cta.text}</p>
+  <p class="cta-row">
+    <a class="btn" href={`mailto:${SITE.email}?subject=${encodeURIComponent(t.mail.project)}`}>{t.cta.email}</a>
+    <a class="btn ghost" href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a>
+  </p>
+</section>

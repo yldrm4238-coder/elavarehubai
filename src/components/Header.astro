@@ -1,0 +1,66 @@
+---
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { ui, lp, otherLang, type Lang } from "../i18n";
+const { path, lang, otherPath } = Astro.props as { path: string; lang: Lang; otherPath: string };
+const t = ui[lang].nav;
+const { services } = content(lang);
+const L = (p: string) => lp(lang, p);
+const links: [string, string][] = [[t.services, L("/services/")], [t.work, L("/work/")], [t.about, L("/about/")], [t.contact, L("/contact/")]];
+const current = (h: string) => path.startsWith(h);
+const book = `mailto:${SITE.email}?subject=${encodeURIComponent(ui[lang].mail.discovery)}`;
+const o = otherLang(lang);
+---
+<header class="bar" id="bar">
+  <div class="bar-in">
+    <a class="brand" href={L("/")} aria-label={t.brandAria}><span class="mark" aria-hidden="true"></span>Elevare Hub <span class="ai">AI</span></a>
+
+    <nav class="dnav" aria-label="Main">
+      <ul>
+        <li class="has-sub">
+          <a href={L("/services/")} aria-current={current(L("/services/")) ? "page" : undefined} aria-haspopup="true">{t.services} <span class="chev" aria-hidden="true"></span></a>
+          <div class="sub">
+            <ul>
+              {services.map((s) => <li><a href={L(`/services/${s.slug}/`)}><strong>{s.name}</strong><span>{s.short}</span></a></li>)}
+            </ul>
+            <a class="sub-all" href={L("/services/")}>{t.all}</a>
+          </div>
+        </li>
+        {links.slice(1).map(([l, h]) => <li><a href={h} aria-current={current(h) ? "page" : undefined}>{l}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="bar-right">
+      <a class="lang" href={otherPath} hreflang={o} lang={o} aria-label={t.switchAria}>{t.switchShort}</a>
+      <a class="book" href={book}>{t.book}</a>
+      <details class="mob" id="menu">
+        <summary aria-label={t.menu}><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span></summary>
+        <div class="mob-panel">
+          <nav aria-label="Mobile">
+            <ul class="big">
+              <li><a href={L("/")}>{t.home}</a></li>
+              {links.map(([l, h]) => <li><a href={h} aria-current={current(h) ? "page" : undefined}>{l}</a></li>)}
+            </ul>
+          </nav>
+          <div class="mini">
+            <p class="lbl">{t.whatWeBuild}</p>
+            <ul class="cols">{services.map((s) => <li><a href={L(`/services/${s.slug}/`)}>{s.name}</a></li>)}</ul>
+          </div>
+          <div class="mini two-c">
+            <div><p class="lbl">{t.contact}</p><a href={`mailto:${SITE.email}`}>{ui[lang].cta.email}</a><br /><a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a></div>
+            <div><p class="lbl">{t.social}</p><a href={SITE.instagram} target="_blank" rel="me noopener">Instagram</a><br /><a href={otherPath} hreflang={o} lang={o}>{o === "nl" ? "Nederlands" : "English"}</a></div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+<script>
+  const d = document.getElementById("menu") as HTMLDetailsElement | null;
+  if (d) {
+    const close = () => { d.open = false; };
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && d.open) { close(); (d.querySelector("summary") as HTMLElement).focus(); } });
+    document.addEventListener("click", (e) => { if (d.open && !d.contains(e.target as Node)) close(); });
+    d.querySelectorAll(".mob-panel a").forEach((a) => a.addEventListener("click", close));
+  }
+</script>

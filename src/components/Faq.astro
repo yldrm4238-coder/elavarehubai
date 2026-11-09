@@ -1,0 +1,16 @@
+---
+import type { Faq } from "../data/site";
+import { ui, type Lang } from "../i18n";
+const { items, heading, lang = "en" } = Astro.props as { items: Faq[]; heading?: string; lang?: Lang };
+---
+<section class="faq" aria-labelledby="faq-h">
+  <h2 id="faq-h" class="h2">{heading ?? ui[lang].faq.h}</h2>
+  <div class="faq-list">
+    {items.map((f) => (
+      <details>
+        <summary>{f.q}</summary>
+        <p>{f.a}</p>
+      </details>
+    ))}
+  </div>
+</section>

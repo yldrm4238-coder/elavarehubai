@@ -1,0 +1,48 @@
+---
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import Collage from "../components/Collage.astro";
+import { content } from "../data/content";
+import { breadcrumbs } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+import { Image } from "astro:assets";
+import { work } from "../lib/img";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const { projects, alsoBuilt } = content(lang);
+---
+<Base title={t.work.title} description={t.work.description} path={L("/work/")}
+  schema={[breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.work, L("/work/")]])]}>
+  <div class="wrap page-head">
+    <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / {t.crumbs.work}</p>
+    <h1 class="h1">{t.work.h1}</h1>
+    <p class="lede" style="margin-top:1.5rem">{t.work.lede}</p>
+  </div>
+  <div class="panels">
+  {projects.map((p) => (
+    <article class="panel" style={`--bg:${p.bg};--ink-c:${p.ink}`} aria-labelledby={`p-${p.slug}`}>
+      <div class="panel-grid">
+        <div>
+          <p class="kicker">{p.kind}</p>
+          <h2 id={`p-${p.slug}`} class="mega">{p.name}</h2>
+          <p style="margin-top:1.5rem">{p.paras[0]}</p>
+          <p class="stack">{p.stack}</p>
+          <a class="more" href={L(`/work/${p.slug}/`)}>{t.home.readCase}</a>
+        </div>
+        <div style="position:relative"><Collage shots={p.shots} /></div>
+      </div>
+    </article>
+  ))}
+  </div>
+  <section class="wrap" aria-labelledby="also-h">
+    <h2 id="also-h" class="h2">{t.home.also}</h2>
+    <div class="also">
+      {alsoBuilt.map((a) => (
+        <article><a href={a.href} target="_blank" rel="noopener"><Image src={work(a.file)} alt={a.alt} widths={[480, 800]} sizes="(min-width: 900px) 40vw, 90vw" loading="lazy" /></a>
+        <h3>{a.name}</h3><p>{a.desc} <a href={a.href} target="_blank" rel="noopener">{t.home.visit}</a></p></article>
+      ))}
+    </div>
+  </section>
+  <Cta lang={lang} />
+</Base>

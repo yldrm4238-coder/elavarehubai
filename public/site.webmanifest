@@ -1,0 +1,1 @@
+{ "name": "Elevare Hub AI", "short_name": "Elevare Hub", "start_url": "/", "display": "browser", "background_color": "#fbfaf7", "theme_color": "#fbfaf7", "icons": [{ "src": "/logo.png", "sizes": "512x512", "type": "image/png" }] }

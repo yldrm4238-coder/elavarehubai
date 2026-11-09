@@ -1,0 +1,14 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../data/site";
+import { ui, lp, type Lang } from "../i18n";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+---
+<Base title={t.privacy.title} description={t.privacy.description} path={L("/privacy/")}>
+  <div class="wrap page-head"><p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / {t.crumbs.privacy}</p><h1 class="h1">{t.privacy.h1}</h1><p>{t.privacy.updated}</p></div>
+  <section class="wrap prose" style="padding-top:0">
+    {t.privacy.sections(SITE.url, SITE.email).map(([h, p]) => (<><h2>{h}</h2><p set:html={p} /></>))}
+  </section>
+</Base>

@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { breadcrumbs } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const { stack } = content(lang);
+---
+<Base title={t.about.title} description={t.about.description} path={L("/about/")}
+  schema={[breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.about, L("/about/")]])]}>
+  <div class="wrap page-head">
+    <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / {t.crumbs.about}</p>
+    <h1 class="h1">{t.about.h1}</h1>
+    <p class="def">{t.about.def}</p>
+  </div>
+  <section class="wrap two" style="padding-top:2rem">
+    <h2 class="h2" style="font-size:clamp(1.6rem,3vw,2.4rem)">{t.about.who}</h2>
+    <div class="prose">
+      <p set:html={t.about.p1(SITE.founder.name)} />
+      <p set:html={t.about.p2(L)} />
+      <h2>{t.about.how}</h2>
+      <p>{t.about.p3}</p>
+      <h2>{t.about.use}</h2>
+      <p>{stack.join(", ")}.</p>
+      <p><a class="btn" href={`mailto:${SITE.email}`}>{t.about.touch}</a></p>
+    </div>
+  </section>
+  <Cta lang={lang} />
+</Base>

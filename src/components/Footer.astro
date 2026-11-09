@@ -1,0 +1,36 @@
+---
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { ui, lp, type Lang } from "../i18n";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const { services } = content(lang);
+const L = (p: string) => lp(lang, p);
+---
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p class="foot-brand">Elevare Hub AI</p>
+      <p>{t.tagline}</p>
+    </div>
+    <nav aria-label={t.footer.services}>
+      <p class="foot-h">{t.footer.services}</p>
+      <ul>{services.map((s) => <li><a href={L(`/services/${s.slug}/`)}>{s.name}</a></li>)}</ul>
+    </nav>
+    <nav aria-label={t.footer.company}>
+      <p class="foot-h">{t.footer.company}</p>
+      <ul>
+        <li><a href={L("/work/")}>{t.nav.work}</a></li><li><a href={L("/about/")}>{t.nav.about}</a></li><li><a href={L("/contact/")}>{t.nav.contact}</a></li><li><a href={L("/privacy/")}>{t.footer.privacy}</a></li>
+      </ul>
+    </nav>
+    <div>
+      <p class="foot-h">{t.footer.talk}</p>
+      <ul>
+        <li><a href={`mailto:${SITE.email}`}>{t.cta.email}</a></li>
+        <li><a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a></li>
+        <li><a href={SITE.instagram} rel="me noopener" target="_blank">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <p class="foot-small">{t.footer.small(SITE.updated)}</p>
+</footer>

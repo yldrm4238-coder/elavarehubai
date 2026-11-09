@@ -1,0 +1,65 @@
+---
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource-variable/instrument-sans/index.css";
+import "@fontsource/reenie-beanie/400.css";
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE } from "../data/site";
+import { graph, organization, website, founder } from "../lib/schema";
+import { ui, lp, langOf, canonicalPath, otherLang, type Lang } from "../i18n";
+
+interface Props { title: string; description: string; path: string; schema?: object[]; noindex?: boolean; ogType?: string }
+const { title, description, path, schema = [], noindex = false, ogType = "website" } = Astro.props;
+const lang: Lang = langOf(path);
+const t = ui[lang];
+const en = canonicalPath(path);
+const altEn = `${SITE.url}${en}`, altNl = `${SITE.url}${lp("nl", en)}`;
+const other = otherLang(lang);
+const otherPath = lp(other, en);
+const canonical = `${SITE.url}${path}`;
+const ld = graph(organization(lang), website(), founder(lang), ...schema);
+---
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="alternate" hreflang="en" href={altEn} />}
+    {!noindex && <link rel="alternate" hreflang="nl" href={altNl} />}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={altEn} />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#fbfaf7" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable summary" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={t.ogLocale} />
+    <meta property="og:locale:alternate" content={ui[other].ogLocale} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${SITE.url}/og.png`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.ogAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${SITE.url}/og.png`} />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">{t.skip}</a>
+    <Header path={path} lang={lang} otherPath={otherPath} />
+    <main id="main"><slot /></main>
+    <Footer lang={lang} />
+  </body>
+</html>

@@ -1,0 +1,37 @@
+---
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import Collage from "../components/Collage.astro";
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { breadcrumbs, projectSchema } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const p = content(lang).projects.find((x) => x.slug === slug)!;
+---
+<Base title={p.title} description={p.description} path={L(`/work/${p.slug}/`)}
+  schema={[projectSchema(p, lang), breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.work, L("/work/")], [p.name, L(`/work/${p.slug}/`)]])]}>
+  <section class="proj-hero" style={`--bg:${p.bg};--ink-c:${p.ink}`}>
+    <div class="wrap">
+      <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / <a href={L("/work/")}>{t.crumbs.work}</a> / {p.name}</p>
+      <div class="panel-grid">
+        <div>
+          <p class="kicker">{p.kind}</p>
+          <h1 class="mega" style="font-size:clamp(3rem,8vw,8rem)">{p.name}</h1>
+          {p.paras.map((x: string, i: number) => <p style={i === 0 ? "margin-top:1.5rem" : ""}>{x}</p>)}
+          <p class="stack">{t.work.builtWith} {p.stack}</p>
+          {p.live && <p><a class="more" href={p.live} target="_blank" rel="noopener" style="font-weight:600">{t.work.live}</a></p>}
+        </div>
+        <div style="position:relative"><Collage shots={p.shots} eager /><p class="hand note">{p.note}</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="wrap">
+    <h2 class="h2">{t.work.needH}</h2>
+    <p class="lede" style="margin-top:1rem">{t.work.needText}</p>
+    <p class="hero-cta"><a class="btn" href={`mailto:${SITE.email}?subject=${encodeURIComponent(t.mail.projectLike + p.name)}`}>{t.work.email}</a><a class="btn ghost" href={L("/services/apps-websites/")}>{t.work.appsLink}</a></p>
+  </section>
+  <Cta lang={lang} />
+</Base>

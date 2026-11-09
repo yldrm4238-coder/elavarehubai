@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../data/site";
+import { breadcrumbs } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+---
+<Base title={t.contact.title} description={t.contact.description} path={L("/contact/")}
+  schema={[breadcrumbs([[t.crumbs.home, L("/")], [t.crumbs.contact, L("/contact/")]])]}>
+  <div class="wrap page-head">
+    <p class="crumbs"><a href={L("/")}>{t.crumbs.home}</a> / {t.crumbs.contact}</p>
+    <h1 class="h1">{t.contact.h1}</h1>
+    <p class="def">{t.contact.def}</p>
+  </div>
+  <section class="wrap" style="padding-top:1rem">
+    <ul class="deliver" style="max-width:48rem">
+      <li><span class="n">01</span><div><h3>{t.contact.email}</h3><p><a href={`mailto:${SITE.email}?subject=${encodeURIComponent(t.mail.discovery)}`}>{t.cta.email}</a></p></div></li>
+      <li><span class="n">02</span><div><h3>{t.contact.phone}</h3><p><a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a></p></div></li>
+      <li><span class="n">03</span><div><h3>{t.contact.instagram}</h3><p><a href={SITE.instagram} rel="me noopener" target="_blank">@elevarehub.ai</a></p></div></li>
+      <li><span class="n">04</span><div><h3>{t.contact.where}</h3><p>{t.contact.whereText}</p></div></li>
+    </ul>
+  </section>
+</Base>

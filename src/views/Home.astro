@@ -1,0 +1,108 @@
+---
+import Base from "../layouts/Base.astro";
+import Collage from "../components/Collage.astro";
+import Faq from "../components/Faq.astro";
+import Cta from "../components/Cta.astro";
+import { SITE } from "../data/site";
+import { content } from "../data/content";
+import { faqPage } from "../lib/schema";
+import { ui, lp, type Lang } from "../i18n";
+import { Image } from "astro:assets";
+import { work } from "../lib/img";
+
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const L = (p: string) => lp(lang, p);
+const { services, projects, alsoBuilt, steps, stack, homeFaqs } = content(lang);
+
+const heroShots = [
+  { file: "godofink-calendar", style: "left:0%;top:36%;width:57%;--r:-2.4deg" },
+  { file: "fondo-kiosk", style: "left:41%;top:0%;width:31%;--r:3.2deg" },
+  { file: "gusto-app-menu", style: "left:68%;top:6%;width:21%;--r:-2.6deg" },
+  { file: "kolaytemizle-app", style: "left:85%;top:26%;width:20%;--r:4deg" },
+].map((s, i) => ({ ...s, alt: t.home.heroAlts[i] }));
+---
+<Base title={t.home.title} description={t.home.description} path={L("/")} schema={[faqPage(homeFaqs)]}>
+  <section class="hero wrap" aria-labelledby="h1">
+    <div class="hero-grid">
+      <div>
+        <p class="kicker">{t.home.kicker}</p>
+        <h1 id="h1" class="h1">{t.home.h1}</h1>
+        <p class="lede">{t.home.lede}</p>
+        <p class="hero-cta">
+          <a class="btn" href={`mailto:${SITE.email}?subject=${encodeURIComponent(t.mail.discovery)}`}>{t.home.book}</a>
+          <a class="btn ghost hero-link" href={L("/work/")}>{t.home.seeWork} <span aria-hidden="true">↓</span></a>
+        </p>
+      </div>
+      <div style="position:relative">
+        <Collage shots={heroShots} eager ratio="1 / .8" />
+        <p class="hand note">{t.home.note}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="svc-h">
+    <p class="kicker">{t.home.svcKicker}</p>
+    <h2 id="svc-h" class="h2">{t.home.svcH2}</h2>
+    <ul class="svc-list">
+      {services.map((s, i) => (
+        <li><a class="svc-row" href={L(`/services/${s.slug}/`)}>
+          <span class="n">0{i + 1}</span><span class="t">{s.name}</span><p class="d">{s.short}</p><span class="arr" aria-hidden="true">→</span>
+        </a></li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="work-head wrap" id="work">
+    <p class="kicker">{t.home.workKicker}</p>
+    <h2 class="h2">{t.home.workH2}</h2>
+  </div>
+  <div class="panels">
+  {projects.map((p) => (
+    <article class="panel" style={`--bg:${p.bg};--ink-c:${p.ink}`} aria-labelledby={`p-${p.slug}`}>
+      <div class="panel-grid">
+        <div>
+          <p class="kicker">{p.kind}</p>
+          <h3 id={`p-${p.slug}`} class="mega">{p.name}</h3>
+          <p style="margin-top:1.5rem">{p.paras[0]}</p>
+          <p class="stack">{p.stack}</p>
+          <a class="more" href={L(`/work/${p.slug}/`)}>{t.home.readCase}</a>
+        </div>
+        <div style="position:relative">
+          <Collage shots={p.shots} />
+          <p class="hand note">{p.note}</p>
+        </div>
+      </div>
+    </article>
+  ))}
+  </div>
+
+  <section class="wrap" aria-labelledby="also-h">
+    <h2 id="also-h" class="h2">{t.home.also}</h2>
+    <div class="also">
+      {alsoBuilt.map((a) => (
+        <article>
+          <a href={a.href} target="_blank" rel="noopener"><Image src={work(a.file)} alt={a.alt} widths={[480, 800]} sizes="(min-width: 900px) 40vw, 90vw" loading="lazy" /></a>
+          <h3>{a.name}</h3>
+          <p>{a.desc} <a href={a.href} target="_blank" rel="noopener">{t.home.visit}</a></p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="how-h">
+    <p class="kicker">{t.home.howKicker}</p>
+    <h2 id="how-h" class="h2">{t.home.howH2}</h2>
+    <ol class="steps">
+      {steps.map((s) => <li><h3>{s.h}</h3><p>{s.p}</p></li>)}
+    </ol>
+  </section>
+
+  <section class="wrap" aria-labelledby="stack-h">
+    <h2 id="stack-h" class="h2">{t.home.stackH2}</h2>
+    <ul class="stack-list">{stack.map((x) => <li>{x}</li>)}</ul>
+  </section>
+
+  <section class="wrap"><Faq items={homeFaqs} lang={lang} /></section>
+  <Cta lang={lang} />
+</Base>
