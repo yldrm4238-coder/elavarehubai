@@ -3,7 +3,7 @@ export function GET() {
   const body = `# ${SITE.name}: full content (updated ${SITE.updated})
 
 ${SITE.name} is a studio. ${SITE.tagline}
-Founder: ${SITE.founder.name}, ${SITE.founder.role}. Contact page https://www.elevarehub.ai/contact/, phone ${SITE.phoneDisplay}.
+Developer: ${SITE.founder.name}, ${SITE.founder.role}. Contact page https://www.elevarehub.ai/contact/, phone ${SITE.phoneDisplay}.
 
 ## How we work
 ${steps.map((s, i) => `${i + 1}. ${s.h}: ${s.p}`).join("\n")}

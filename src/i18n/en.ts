@@ -66,7 +66,7 @@ export const en = {
     email: "Email us", appsLink: "Apps & websites",
   },
   about: {
-    title: "About Elevare Hub AI and Founder Yıldırım Çelik",
+    title: "About Elevare Hub AI and Yıldırım Çelik",
     description: "Elevare Hub AI is a studio led by Yıldırım Çelik, a full-stack developer who builds the app people tap on and the system behind it.",
     h1: "A small studio that builds the whole thing.",
     def: "Elevare Hub AI is a small studio. We run Instagram and Google ads and build custom apps, websites, AI assistants and CRM automation, and we look after them after launch.",

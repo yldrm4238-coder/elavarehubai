@@ -7,7 +7,7 @@ export const SITE = {
   phone: "+31657138308",
   phoneDisplay: "+31 6 57 13 83 08",
   instagram: "https://www.instagram.com/elevarehub.ai",
-  founder: { name: "Yıldırım Çelik", role: "Founder & AI Architect" },
+  founder: { name: "Yıldırım Çelik", role: "Developer" },
   updated: "2026-11-09",
 };
 

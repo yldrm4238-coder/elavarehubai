@@ -3,7 +3,7 @@ import { servicesNl } from "../data/site.nl";
 export function GET() {
   const body = `# ${SITE.name}
 
-> ${SITE.name} is a studio that runs Instagram and Google ads and builds custom web and mobile apps, websites, AI assistants and CRM automation systems. Founder: ${SITE.founder.name}. Contact: https://www.elevarehub.ai/contact/
+> ${SITE.name} is a studio that runs Instagram and Google ads and builds custom web and mobile apps, websites, AI assistants and CRM automation systems. Developer: ${SITE.founder.name}. Contact: https://www.elevarehub.ai/contact/
 
 ## Services
 ${services.map((s) => `- [${s.name}](${SITE.url}/services/${s.slug}/): ${s.short}`).join("\n")}
